@@ -72,8 +72,13 @@ func (m *MongoJuboRepository) ListPatients() []domain.Patient {
 }
 
 func (m *MongoJuboRepository) UpdatePatient(patient domain.Patient) (successful bool, err error) {
-	//TODO implement me
-	panic("implement me")
+	filter := bson.D{{"_id", patient.Id}}
+	update := bson.D{{"$set", patient}}
+	result, err := m.patientColl.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return false, err
+	}
+	return result.ModifiedCount == 1, nil
 }
 
 func (m *MongoJuboRepository) InsertOrder(order domain.Order) (success bool, err error) {

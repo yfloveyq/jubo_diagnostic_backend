@@ -18,8 +18,7 @@ func (service *PatientService) ListPatients() []domain.Patient {
 }
 
 func (service *PatientService) UpdatePatient(patient domain.Patient) (success bool, err error) {
-	//TODO implement me
-	panic("implement me")
+	return service.juboRepository.UpdatePatient(patient)
 }
 
 func (service *PatientService) InsertOrder(patient domain.Patient, order domain.Order) (success bool, err error) {
