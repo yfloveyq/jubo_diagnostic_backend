@@ -5,8 +5,8 @@ import (
 )
 
 type Patient struct {
-	Id        primitive.ObjectID `bson:"_id"`
+	ID        primitive.ObjectID `bson:"_id"`
 	Name      string
-	orderList []primitive.ObjectID `bson:"orderList"`
+	OrderList []primitive.ObjectID `bson:"orderList"`
 	Orders    []Order
 }

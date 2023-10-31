@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"jubo.com/eric/diagnostic/domain"
@@ -72,7 +73,10 @@ func (m *MongoJuboRepository) ListPatients() []domain.Patient {
 }
 
 func (m *MongoJuboRepository) UpdatePatient(patient domain.Patient) (successful bool, err error) {
-	filter := bson.D{{"_id", patient.Id}}
+	if patient.Orders != nil {
+		patient.Orders = nil
+	}
+	filter := bson.D{{"_id", patient.ID}}
 	update := bson.D{{"$set", patient}}
 	result, err := m.patientColl.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
@@ -81,17 +85,29 @@ func (m *MongoJuboRepository) UpdatePatient(patient domain.Patient) (successful 
 	return result.ModifiedCount == 1, nil
 }
 
-func (m *MongoJuboRepository) InsertOrder(order domain.Order) (success bool, err error) {
-	//TODO implement me
-	panic("implement me")
+func (m *MongoJuboRepository) InsertOrder(order domain.Order) (id primitive.ObjectID, err error) {
+	result, err := m.orderColl.InsertOne(m.ctx, order)
+	if err != nil {
+		return primitive.ObjectID{}, err
+	}
+	return result.InsertedID.(primitive.ObjectID), err
 }
 
 func (m *MongoJuboRepository) UpdateOrder(order domain.Order) (success bool, err error) {
-	//TODO implement me
-	panic("implement me")
+	filter := bson.D{{"_id", order.ID}}
+	update := bson.D{{"$set", order}}
+	result, err := m.orderColl.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return false, err
+	}
+	return result.ModifiedCount == 1, nil
 }
 
-func (m *MongoJuboRepository) DeleteOrder(id string) (successful bool, err error) {
-	//TODO implement me
-	panic("implement me")
+func (m *MongoJuboRepository) DeleteOrder(id primitive.ObjectID) (successful bool, err error) {
+	filter := bson.D{{"_id", id}}
+	result, err := m.orderColl.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		return false, err
+	}
+	return result.DeletedCount == 1, nil
 }
