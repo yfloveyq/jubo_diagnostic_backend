@@ -19,8 +19,17 @@ type RestfulController struct {
 }
 
 func NewRestfulController() *RestfulController {
+
+	r := gin.Default()
+	r.Use(func() gin.HandlerFunc {
+		return func(c *gin.Context) {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+			c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+		}
+	}(),
+	)
 	return &RestfulController{
-		r: gin.Default(),
+		r,
 	}
 }
 
